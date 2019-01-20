@@ -6,3 +6,9 @@ ipch/
 *.opensdf
 *.sdf
 *.cachefile
+
+#ubuntu exec file
+*.out
+
+#temporary file
+*~
