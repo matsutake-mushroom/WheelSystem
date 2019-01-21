@@ -24,6 +24,22 @@ void SoundUnit::writeSequenceStep(stringstream &output, int step, bool isEnd) {
 	output << endl;
 }
 
+void SoundUnit::writeNoLoopSequenceStep(stringstream &output, int step, bool isEnd) {
+	string comma = string(",");
+	output << "STEP#" << step << "=";
+	output << showpoint << (double)length << "E-03" << comma;//����
+	output << string((isEnd) ? "STOP" : "CONT") << comma;//�Ōォ�p����
+	//output << "STOP" << comma;
+	output << "OFF" << comma;//�I�[�g�z�[���h(�Ƃ́H)
+	output << 1 << comma;//�X�e�b�v�R�[�h(�Ƃ́H)
+	output << "OFF" << comma << 1 << comma;//�X�e�[�g�u�����`�X�e�b�v����H[ON/OFF]�A���̃X�e�b�v�l
+	output << "OFF" << comma << 1 << comma;//�C�x���g�u�����`�X�e�b�v����H[ON/OFF]�A���̃X�e�b�v�l
+	output << "OFF" << comma << 0 << comma; //�W�����v�X�e�b�v����H[ON/OFF]�A���̃X�e�b�v�l
+	output << "INF" << comma << 1 << comma;//�W�����v�񐔎w�肷��H[INF/ON]�A�W�����v��[ON�̂Ƃ�](0���ƃR���p�C������Ȃ��I�I�I�I)
+	output << "OFF" << comma << 0.0;//�I���ʑ��w�肷��H[ON/OFF]�A���̈ʑ�
+	output << endl;
+}
+
 vector<map<pair<double, int>, double>> PureTone::sound_pressure_map_vector;//static�̎���
 std::map<std::pair<double, int>, double> PureTone::default_sound_pressure_map;//����, SPM[0]
 bool PureTone::sound_pressure_map_is_initialized = false;
@@ -82,9 +98,34 @@ void PureTone::writeSequenceChannel(stringstream &output, int step, int channel)
 	output << 50.0 << comma;//Duty[%],real number
 	output << "CONS" << endl;//dousa
 							 //CH2 for debug
-	output << "CHAN#" << step << "#" << 2 << "=SIN,0,NORM,FS,OFF,1000.00000000,CONS,1.0000E-01,CONS,0.0000E+00,CONS,0.000,CONS,50.0000,CONS" << endl;
+	output << "CHAN#" << step << "#" << 2 << "=DC,0,NORM,FS,OFF,1000.00000000,CONS,0.0000E+00,CONS,0.0000E+00,CONS,0.000,CONS,50.0000,CONS" << endl;
 }
+void PureTone::writeSequenceChannelWithCh2TRIGGER(stringstream &output, int step, int channel) {//���Ȃ�
+	string comma = ",";
+	output << "CHAN#" << step << "#" << channel << "=";
+	output << "DC" << comma;//�g�`
+	output << "0" << comma;//�C�Ӕg�ԍ�
+	output << "NORM" << comma;//�ɐ�(NORMal, INVert)
+	output << "FS" << comma;//�g�`����(PFS->���AFS->����, MFS->��
+	output << "OFF" << comma;//���`�g�g��(OFF/ON)
 
+	output << showpoint << (double)(1000) << comma;//���g��(����)
+	output << "CONS" << comma;//����(KEEP/CONStant/SWEep)
+
+	output << "0.0000E+00" << comma;//�U��(real number)
+	output << "CONS" << comma;//����(KEEP/CONStant/SWEep)
+
+	output << "0.0000E+00" << comma;//DC offset
+	output << "CONS" << comma;//����
+
+	output << "0.0000E+00" << comma;//Phase
+	output << "CONS" << comma;//����
+
+	output << 50.0 << comma;//Duty[%],real number
+	output << "CONS" << endl;//����
+							 //CH2 for debug
+	output << "CHAN#" << step << "#" << 2 << "=SQU,0,NORM,FS,OFF,100.00000000,CONS,3.0000E+00,CONS,0.0000E+00,CONS,0.000,CONS,50.0000,CONS" << endl;
+}
 int PureTone::addSoundPressureMap(){
 	if (!sound_pressure_map_is_initialized) {
 		initSoundPressureMap();
@@ -131,7 +172,7 @@ void PureTone::soundCalibrationFromCSV(int soundMapID, string filename) {
 
 	CSV csvfile(filename);
 	for (int i = 1; i < csvfile.Row; ++i) {
-		soundCalibration(id, stod(csvfile[i][0]), stoi(csvfile[i][1]), stod(csvfile[i][2]));
+		soundCalibration(id, stof(csvfile[i][0]), stoi(csvfile[i][1]), stof(csvfile[i][2]));
 	}
 }
 
@@ -164,9 +205,34 @@ void Click::writeSequenceChannel(stringstream &output, int step, int channel) {/
 	output << 0.025 << comma;//Duty[%],real number
 	output << "CONS" << endl;//����
 							 //CH2 for debug
-	output << "CHAN#" << step << "#" << 2 << "=SIN,0,NORM,FS,OFF,1000.00000000,CONS,1.0000E-01,CONS,0.0000E+00,CONS,0.000,CONS,50.0000,CONS" << endl;
+	output << "CHAN#" << step << "#" << 2 << "=DC,0,NORM,FS,OFF,1000.00000000,CONS,0.0000E+00,CONS,0.0000E+00,CONS,0.000,CONS,50.0000,CONS" << endl;
 }
+void Click::writeSequenceChannelWithCh2TRIGGER(stringstream &output, int step, int channel) {//���Ȃ�
+	string comma = ",";
+	output << "CHAN#" << step << "#" << channel << "=";
+	output << "DC" << comma;//�g�`
+	output << "0" << comma;//�C�Ӕg�ԍ�
+	output << "NORM" << comma;//�ɐ�(NORMal, INVert)
+	output << "FS" << comma;//�g�`����(PFS->���AFS->����, MFS->��
+	output << "OFF" << comma;//���`�g�g��(OFF/ON)
 
+	output << showpoint << (double)(1000) << comma;//���g��(����)
+	output << "CONS" << comma;//����(KEEP/CONStant/SWEep)
+
+	output << "0.0000E+00" << comma;//�U��(real number)
+	output << "CONS" << comma;//����(KEEP/CONStant/SWEep)
+
+	output << "0.0000E+00" << comma;//DC offset
+	output << "CONS" << comma;//����
+
+	output << "0.0000E+00" << comma;//Phase
+	output << "CONS" << comma;//����
+
+	output << 50.0 << comma;//Duty[%],real number
+	output << "CONS" << endl;//����
+							 //CH2 for debug
+	output << "CHAN#" << step << "#" << 2 << "=SQU,0,NORM,FS,OFF,100.00000000,CONS,3.0000E+00,CONS,1.0000E+00,CONS,0.000,CONS,50.0000,CONS" << endl;
+}
 
 Silence::Silence(int len) : SoundUnit(len) {
 	name = "Silence";
@@ -174,7 +240,7 @@ Silence::Silence(int len) : SoundUnit(len) {
 void Silence::writeSequenceChannel(stringstream &output, int step, int channel) {//���Ȃ�
 	string comma = ",";
 	output << "CHAN#" << step << "#" << channel << "=";
-	output << "SIN" << comma;//�g�`
+	output << "DC" << comma;//�g�`
 	output << "0" << comma;//�C�Ӕg�ԍ�
 	output << "NORM" << comma;//�ɐ�(NORMal, INVert)
 	output << "FS" << comma;//�g�`����(PFS->���AFS->����, MFS->��
@@ -195,7 +261,34 @@ void Silence::writeSequenceChannel(stringstream &output, int step, int channel) 
 	output << 50.0 << comma;//Duty[%],real number
 	output << "CONS" << endl;//����
 	//CH2 for debug
-	output << "CHAN#" << step << "#" << 2 << "=SIN,0,NORM,FS,OFF,1000.00000000,CONS,1.0000E-01,CONS,0.0000E+00,CONS,0.000,CONS,50.0000,CONS" << endl;
+	output << "CHAN#" << step << "#" << 2 << "=DC,0,NORM,FS,OFF,1000.00000000,CONS,0.0000E+00,CONS,0.0000E+00,CONS,0.000,CONS,50.0000,CONS" << endl;
+}
+
+void Silence::writeSequenceChannelWithCh2TRIGGER(stringstream &output, int step, int channel) {//���Ȃ�
+	string comma = ",";
+	output << "CHAN#" << step << "#" << channel << "=";
+	output << "DC" << comma;//�g�`
+	output << "0" << comma;//�C�Ӕg�ԍ�
+	output << "NORM" << comma;//�ɐ�(NORMal, INVert)
+	output << "FS" << comma;//�g�`����(PFS->���AFS->����, MFS->��
+	output << "OFF" << comma;//���`�g�g��(OFF/ON)
+
+	output << showpoint << (double)(1000) << comma;//���g��(����)
+	output << "CONS" << comma;//����(KEEP/CONStant/SWEep)
+
+	output << "0.0000E+00" << comma;//�U��(real number)
+	output << "CONS" << comma;//����(KEEP/CONStant/SWEep)
+
+	output << "0.0000E+00" << comma;//DC offset
+	output << "CONS" << comma;//����
+
+	output << "0.0000E+00" << comma;//Phase
+	output << "CONS" << comma;//����
+
+	output << 50.0 << comma;//Duty[%],real number
+	output << "CONS" << endl;//����
+							 //CH2 for debug
+	output << "CHAN#" << step << "#" << 2 << "=SQU,0,NORM,FS,OFF,100.00000000,CONS,3.0000E+00,CONS,0.0000E+00,CONS,0.000,CONS,50.0000,CONS" << endl;
 }
 
 /*******************
@@ -220,14 +313,31 @@ string SoundVector::createSequenceCommand() {
 	return sequenceCommand;
 }
 
+string SoundVector::createSequenceCommand(int mode) {
+	string sequenceFile;
+	string sequenceCommand;
+	int digit = 0;
+
+	sequenceFile += "[FILE]\nVERSION=\"1.00\"\n[SYSTEM]\nMODEL=\"WF1974\"\nNCHAN=2\nVERSION=\"1.00\"\n[DATA]\n";
+	sequenceFile += "SEQ=1,SSYN,OFF,STAR,POS\n";
+	sequenceFile += createSequenceDataString(mode);
+
+	digit = to_string(sequenceFile.length()).size();
+	sequenceCommand = ":SOUR1:SEQ:STAT ON;"; //CH1��V�[�P���X���[�h��
+	sequenceCommand += ":TRAC:SEQ 0,\"TEST\",#";//SEQ�f�[�^���o�́B������(0~10)�A���O�A�f�[�^�u�v
+	sequenceCommand += to_string(digit) + to_string(sequenceFile.length() + 1) + "\n";
+	sequenceCommand += sequenceFile;
+	return sequenceCommand;
+}
+
 string SoundVector::createSequenceDataString() {
 	stringstream ss;
 	int channel = 1;
 	int step = 1;
 
-	ss << "STEP#0 = 1.0000E+00, CONT, OFF, 1, OFF, 1, OFF, 1, OFF, 1, INF, 1, OFF, 0.000\n";
+	ss << "STEP#0 = 1.0000E-02, CONT, OFF, 1, OFF, 1, OFF, 1, OFF, 1, INF, 1, OFF, 0.000\n";
 	ss << "CHAN#0#1 = DC, 0, NORM, FS, OFF, 1000.00000000, CONS, 0.0000E+00, CONS, 0.0000E+00, CONS, 0.000, CONS, 50.0000, CONS\n";
-	ss << "CHAN#0#2 = SIN, 0, NORM, FS, OFF, 1000.00000000, CONS, 1.0000E-01, CONS, 0.0000E+00, CONS, 0.000, CONS, 50.0000, CONS\n";
+	ss << "CHAN#0#2 = DC, 0, NORM, FS, OFF, 1000.00000000, CONS, 0.0000E+00, CONS, 0.0000E+00, CONS, 0.000, CONS, 50.0000, CONS\n";
 
 	for (auto i = sequence.begin(); i<sequence.end(); ++i) {
 		(*i)->writeSequenceStep(ss, step, ((i+1) == sequence.end()) ? true : false);
@@ -236,6 +346,45 @@ string SoundVector::createSequenceDataString() {
 	}
 	return ss.str();
 }
+
+string SoundVector::createSequenceDataString(int mode) {
+	stringstream ss;
+	int channel = 1;
+	int step = 1;
+
+	ss << "STEP#0 = 1.0000E-02, CONT, OFF, 1, OFF, 1, OFF, 1, OFF, 1, INF, 1, OFF, 0.000\n";
+	ss << "CHAN#0#1 = DC, 0, NORM, FS, OFF, 1000.00000000, CONS, 0.0000E+00, CONS, 0.0000E+00, CONS, 0.000, CONS, 50.0000, CONS\n";
+	ss << "CHAN#0#2 = DC, 0, NORM, FS, OFF, 1000.00000000, CONS, 0.0000E+00, CONS, 0.0000E+00, CONS, 0.000, CONS, 50.0000, CONS\n";
+	switch (mode) {
+	case 0://endless
+		for (auto i = sequence.begin(); i < sequence.end(); ++i) {
+			(*i)->writeSequenceStep(ss, step, ((i + 1) == sequence.end()) ? true : false);
+			(*i)->writeSequenceChannel(ss, step, channel);
+			++step;
+		}
+		break;
+	case 1://start with external-TRIGGER
+		for (auto i = sequence.begin(); i < sequence.end(); ++i) {
+			if ((i + 1) == sequence.end()){//FINISH
+				(*i)->writeNoLoopSequenceStep(ss, step, true);
+				(*i)->writeSequenceChannelWithCh2TRIGGER(ss, step, channel);
+				cout << "End" << endl;
+			}
+			else {
+				(*i)->writeNoLoopSequenceStep(ss, step, false);
+				(*i)->writeSequenceChannel(ss, step, channel);
+				cout << "-" << flush;
+			}
+			++step;
+		}
+		break;
+	default:
+		break;
+	}
+
+	return ss.str();
+}
+
 void SoundVector::resetSequence() {
 	for (auto i = sequence.begin(); i<sequence.end(); ++i) {
 		delete (*i);
@@ -463,4 +612,30 @@ void SoundVector::createRegularPitchSequence(int id = 0) {
 	sequence.push_back(new Silence(interval));
 	sequence.push_back(new PureTone(id, 48, 60, pitchLength));
 	sequence.push_back(new Silence(interval));
+}
+
+void SoundVector::createSequenceFromScore(int id, string filename){
+    CSV score(filename);
+    map<int, double> soundmap;
+
+	int beat_time = (int)(60*1000/stof(CSV::split(score[0][1], ':')[1]));
+	cout << beat_time << "ms" << endl;
+    for(auto s :score[1]){
+        if(s != string("#")){
+            auto line = CSV::split(s,':');
+            soundmap[stoi((line[0]).substr(1))] = stof(line[1].substr(0,(line[1]).length() - 1));
+            cout << line[0] << "," << line[1] << endl;
+        }
+    }
+    
+    resetSequence();
+    for(int i = 2;i<score.Row; ++i){
+		int freq_num = stoi(score[i][0]);
+		int soundtime = stof(score[i][1]) * (float)beat_time;
+		if(freq_num == 0){
+			sequence.push_back(new Silence(soundtime));
+		}else{
+			sequence.push_back(new PureTone(id, soundmap[freq_num], 60, soundtime));
+		}
+    }
 }

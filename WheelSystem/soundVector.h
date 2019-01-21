@@ -14,7 +14,9 @@ public:
 public:
 	SoundUnit(int len);
 	void writeSequenceStep(std::stringstream &output, int step, bool isEnd);
+	void writeNoLoopSequenceStep(std::stringstream & output, int step, bool isEnd);
 	virtual void writeSequenceChannel(std::stringstream &output, int step, int channel) = 0;//pure virtual function
+	virtual void writeSequenceChannelWithCh2TRIGGER(std::stringstream &output, int step, int channel) = 0;
 };
 
 class PureTone : public SoundUnit {
@@ -30,6 +32,7 @@ public:
 	PureTone(double kHz, int dB, int len);
 	PureTone(int SoundMapID, double kHz, int dB, int len);
 	void writeSequenceChannel(std::stringstream &output, int step, int channel);
+	void writeSequenceChannelWithCh2TRIGGER(std::stringstream & output, int step, int channel);
 	static int addSoundPressureMap();
 	static void soundCalibration(double kHz, int dB, double voltage);
 	static void soundCalibration(int soundMapID, double kHz, int dB, double voltage);
@@ -44,6 +47,7 @@ class Click : public SoundUnit {
 public:
 	Click(int len);
 	void writeSequenceChannel(std::stringstream &output, int step, int channel);
+	void writeSequenceChannelWithCh2TRIGGER(std::stringstream & output, int step, int channel);
 };
 
 
@@ -51,6 +55,7 @@ class Silence : public SoundUnit {
 public:
 	Silence(int len);
 	void writeSequenceChannel(std::stringstream &output, int step, int channel);
+	void writeSequenceChannelWithCh2TRIGGER(std::stringstream & output, int step, int channel);
 };
 /*******************
 * sound vector
@@ -67,7 +72,9 @@ public:
 	int length;
 
 	std::string createSequenceCommand();
+	std::string createSequenceCommand(int mode);
 	std::string createSequenceDataString();
+	std::string createSequenceDataString(int mode);
 	void resetSequence();
 	void createRhythmSequence();
 	void createRegularRhythmSequence();
@@ -76,5 +83,6 @@ public:
 	void createPitchSequence(int soundMapID);
 	void createRandomPitchSequence(int soundMapID);
 	void createRegularPitchSequence(int soundMapID);
+	void createSequenceFromScore(int id, std::string filename);
 };
 

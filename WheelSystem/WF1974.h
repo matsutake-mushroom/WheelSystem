@@ -55,6 +55,8 @@ public:
 
 	void send(std::string msg);
 
+	std::string receive();
+
 	void disconnect();
 
 };

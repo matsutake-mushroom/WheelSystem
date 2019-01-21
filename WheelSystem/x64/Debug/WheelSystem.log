@@ -1,0 +1,4 @@
+﻿  Serial.cpp
+c:\users\rat-behavior(right)\documents\users\matsutake\wheelsystem\wheelsystem\serial.cpp : warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+c:\users\rat-behavior(right)\documents\users\matsutake\wheelsystem\wheelsystem\serial.h : warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+  WheelSystem.vcxproj -> C:\Users\rat-behavior(Right)\Documents\Users\matsutake\WheelSystem\x64\Debug\WheelSystem.exe

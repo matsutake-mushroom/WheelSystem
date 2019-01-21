@@ -33,9 +33,12 @@ void CSV::updateSize(){
 void CSV::read_csv(string filename){
 	string buffer;
 	ifstream inputfile(filename);
+	cout << filename << " opening...";
 	if (!inputfile) {
+		cout << !inputfile << endl;
 		return;//open Error
 	}
+	cout << "success." << endl;
 	while (getline(inputfile, buffer)) {
 		data.push_back(split(buffer, ','));
 	}

@@ -3,9 +3,9 @@
 
 void WF1974::open() {
 	if (viOpenDefaultRM(&defaultRm) < VI_SUCCESS) {
-		OutputDebugString((LPCSTR)"//error");
+		OutputDebugString("//error");
 	}
-	sprintf(rsc, "USB0::0x0D4A::0x000E::%d::INSTR", serialNumber);
+	sprintf_s(rsc, "USB0::0x0D4A::0x000E::%d::INSTR", serialNumber);
 	viOpen(defaultRm, rsc, VI_NO_LOCK, (ViUInt32)0, &instr);
 	send("RST;CHA 1;SIG 0;CHA 2;SIG 0;");
 }
@@ -45,6 +45,17 @@ void WF1974::send(std::string msg) {
 	msg.append("\n");
 	ViBuf buf = (ViBuf)(msg.c_str());
 	viWrite(instr, buf, (ViUInt32)strlen((ViPChar)buf), &count_WF);
+}
+
+std::string WF1974::receive() {
+	std::string ret;
+	ViBuf buf = new ViByte[256];
+	ViUInt32 cnt = 256;
+	viRead(instr, buf, cnt, &count_WF);
+	ret = std::string(reinterpret_cast<char*>(buf));
+	delete[] buf;
+	
+	return ret.substr(0,count_WF);
 }
 
 void WF1974::disconnect() {
@@ -97,7 +108,7 @@ void WF1974::WF1974_Sequence::start(){
 }
 
 void WF1974::WF1974_Sequence::stop(){
-	parent->send(":OUTP1 OFF; :TRIG:SEL:EXEC STOP;");
+	parent->send(":OUTP1 OFF;:OUTP2 OFF;:TRIG:SEL:EXEC STOP;");
 }
 
 void WF1974::WF1974_Sequence::immediate_stop(){

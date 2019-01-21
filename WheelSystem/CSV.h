@@ -4,9 +4,9 @@
 class CSV{
 private:
 	std::vector<std::vector<std::string>> data;
-	std::vector<std::string> split(std::string& line, char delimiter);
 	void updateSize();
 public:
+	static std::vector<std::string> split(std::string& line, char delimiter);
 	CSV();
 	CSV(std::string filename);
 	~CSV();

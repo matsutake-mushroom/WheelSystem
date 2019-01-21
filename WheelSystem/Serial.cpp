@@ -1,17 +1,28 @@
 #pragma once
 #include "Serial.h"
-
+#include <iostream>
 Serial::Serial(int baudrate){
-	hComm = CreateFile(
-		"COM3",                       /* �V���A���|�[�g�̕����� */
-		GENERIC_READ | GENERIC_WRITE, /* �A�N�Z�X���[�h */
-		0,                            /* ���L���[�h */
-		NULL,                         /* �Z�L�����e�B���� */
-		OPEN_EXISTING,                /* �쐬�t���O */
-		FILE_ATTRIBUTE_NORMAL,        /* ���� */
-		NULL                          /* �e���v���[�g�̃n���h�� */
-	);
-
+	bool success = false;
+	int counter = 0;
+	while (!success && counter < 10) {
+		hComm = CreateFile(
+			"COM3",                       /* �V���A���|�[�g�̕����� */
+			GENERIC_READ | GENERIC_WRITE, /* �A�N�Z�X���[�h */
+			0,                            /* ���L���[�h */
+			NULL,                         /* �Z�L�����e�B���� */
+			OPEN_EXISTING,                /* �쐬�t���O */
+			FILE_ATTRIBUTE_NORMAL,        /* ���� */
+			NULL                          /* �e���v���[�g�̃n���h�� */
+		);
+		if (hComm == INVALID_HANDLE_VALUE) {
+			std::cout << "ERR: can't open COM3 Port" << std::endl << "code: " << GetLastError() << std::endl;
+			Sleep(20);
+			counter++;
+		}
+		else {
+			success = true;
+		}
+	}
 	GetCommState(hComm, &dcb); /* DCB ��擾 */
 		
 	dcb.DCBlength = sizeof(DCB);

@@ -2,6 +2,7 @@
 #define MATPLOTLIB_HPP
 
 #include <cstdio>
+#include <cstdlib>
 
 class Matplotlib {
 	FILE *p;
@@ -9,7 +10,7 @@ class Matplotlib {
 	public:
 
 	bool open() {
-		p = popen("python -c \"import code; import os; import sys; sys.stdout = sys.stderr = open(os.devnull, 'w'); code.InteractiveConsole().interact()\"", "w");
+		p = _popen("python -c \"import code; import os; import sys; sys.stdout = sys.stderr = open(os.devnull, 'w'); code.InteractiveConsole().interact()\"", "w");
 		if (p == NULL) return false;
 		send_command("import matplotlib.pyplot as plt");
 		send_command("import matplotlib.patches as patches");
@@ -21,7 +22,7 @@ class Matplotlib {
 	bool close() {
 		send_command("plt.close()");
 		send_command("quit()");
-		if (pclose(p) == -1) return false;
+		if (_pclose(p) == -1) return false;
 		return true;
 	}
 
