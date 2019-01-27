@@ -12,3 +12,7 @@ ipch/
 
 #temporary file
 *~
+
+#data file
+*.svg
+*.txt
